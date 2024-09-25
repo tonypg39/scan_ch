@@ -115,7 +115,6 @@ if __name__ == "__main__":
         point_cloud.points = pcd.points
         point_cloud.colors = pcd.colors
 
-
         # print(np.asarray(point_cloud.points))
         o3d.io.write_point_cloud("test.pcd",point_cloud)
         if cv.waitKey(1) >= 0 or True:
