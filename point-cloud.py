@@ -144,6 +144,6 @@ if __name__ == "__main__":
         # vis.update_geometry(point_cloud)
         # vis.poll_events()
         # vis.update_renderer()
-
+        print(point_cloud.points)
         if cv.waitKey(1) >= 0:
             break
