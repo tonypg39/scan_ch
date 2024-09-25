@@ -138,6 +138,12 @@ if __name__ == "__main__":
         # Show the point cloud
         point_cloud.points = pcd.points
         point_cloud.colors = pcd.colors
+        print(np.asarray(point_cloud.points))
+        o3d.visualization.draw_geometries([point_cloud],
+                                  zoom=0.3412,
+                                  front=[0.4257, -0.2125, -0.8795],
+                                  lookat=[2.6172, 2.0475, 1.532],
+                                  up=[-0.0694, -0.9768, 0.2024])
         # if first_time_render_pc:
         #     vis.add_geometry(point_cloud)
         #     first_time_render_pc = 0
@@ -145,5 +151,6 @@ if __name__ == "__main__":
         # vis.poll_events()
         # vis.update_renderer()
         print(np.asarray(point_cloud.points))
+        break
         if cv.waitKey(1) >= 0:
             break
