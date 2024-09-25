@@ -103,10 +103,10 @@ if __name__ == "__main__":
         ir_map = np.array(frame.getData(tof.FrameDataType.IR), dtype="uint16", copy=False)
         
         # Create the IR image
-        # ir_map = ir_map[0: int(ir_map.shape[0]), :]
-        # ir_map = distance_scale_ir * ir_map
-        # ir_map = np.uint8(ir_map)
-        # ir_map = cv.cvtColor(ir_map, cv.COLOR_GRAY2RGB)
+        ir_map = ir_map[0: int(ir_map.shape[0]), :]
+        ir_map = distance_scale_ir * ir_map
+        ir_map = np.uint8(ir_map)
+        ir_map = cv.cvtColor(ir_map, cv.COLOR_GRAY2RGB)
 
         # Show IR image
         # vis_ir.add_geometry(transform_image(ir_map))
