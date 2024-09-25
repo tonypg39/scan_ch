@@ -4,15 +4,10 @@ import cv2 as cv
 import open3d as o3d
 from enum import Enum
 
-# WINDOW_NAME_DEPTH = "Display Depth"
-# WINDOW_NAME_COLOR = "Display Color"
-
-
 class ModesEnum(Enum):
     MODE_NEAR = 0
     MODE_MEDIUM = 1
     MODE_FAR = 2
-
 
 def transform_image(np_image):
     return o3d.geometry.Image(np_image)
@@ -80,17 +75,6 @@ if __name__ == "__main__":
     distance_scale_ir = 255.0 / max_value_of_IR_pixel
     distance_scale = 255.0 / camera_range
 
-    # Create visualizer for depth and ir
-    # vis_depth = o3d.visualization.Visualizer()
-    # vis_depth.create_window("Depth", width, height)
-
-    # vis_ir = o3d.visualization.Visualizer()
-    # vis_ir.create_window("IR", width, height)
-
-    # Create visualizer
-    # vis = o3d.visualization.Visualizer()
-    # vis.create_window("PointCloud", 1200, 1200)
-    # first_time_render_pc = 1
     point_cloud = o3d.geometry.PointCloud()
 
     while True:
@@ -108,20 +92,12 @@ if __name__ == "__main__":
         ir_map = np.uint8(ir_map)
         ir_map = cv.cvtColor(ir_map, cv.COLOR_GRAY2RGB)
 
-        # Show IR image
-        # vis_ir.add_geometry(transform_image(ir_map))
-        # vis_ir.poll_events()
-
         # Create the Depth image
         new_shape = (int(depth_map.shape[0]), depth_map.shape[1])
         depth16bits_map = depth_map = np.resize(depth_map, new_shape)
         depth_map = distance_scale * depth_map
         depth_map = np.uint8(depth_map)
         depth_map = cv.applyColorMap(depth_map, cv.COLORMAP_RAINBOW)
-
-        # Show depth image
-        # vis_depth.add_geometry(transform_image(depth_map))
-        # vis_depth.poll_events()
 
         # Create color image
         img_color = cv.addWeighted(ir_map, 0.4, depth_map, 0.6, 0)
@@ -138,19 +114,10 @@ if __name__ == "__main__":
         # Show the point cloud
         point_cloud.points = pcd.points
         point_cloud.colors = pcd.colors
-        print(np.asarray(point_cloud.points))
-        o3d.visualization.draw_geometries([point_cloud],
-                                  zoom=0.3412,
-                                  front=[0.4257, -0.2125, -0.8795],
-                                  lookat=[2.6172, 2.0475, 1.532],
-                                  up=[-0.0694, -0.9768, 0.2024])
-        # if first_time_render_pc:
-        #     vis.add_geometry(point_cloud)
-        #     first_time_render_pc = 0
-        # vis.update_geometry(point_cloud)
-        # vis.poll_events()
-        # vis.update_renderer()
-        print(np.asarray(point_cloud.points))
-        break
-        if cv.waitKey(1) >= 0:
+
+
+        # print(np.asarray(point_cloud.points))
+        o3d.io.write_point_cloud("test.pcd",point_cloud)
+        if cv.waitKey(1) >= 0 or True:
             break
+        
