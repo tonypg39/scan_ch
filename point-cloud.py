@@ -90,6 +90,7 @@ if __name__ == "__main__":
         ir_map = ir_map[0: int(ir_map.shape[0]), :]
         ir_map = distance_scale_ir * ir_map
         ir_map = np.uint8(ir_map)
+        ir_map_gray = ir_map
         ir_map = cv.cvtColor(ir_map, cv.COLOR_GRAY2RGB)
 
         # Create the Depth image
@@ -105,10 +106,7 @@ if __name__ == "__main__":
         color_image = o3d.geometry.Image(img_color)
         depth16bits_image = o3d.geometry.Image(depth16bits_map)
 
-        # Export the images 
-        cv.imwrite("color.jpg",img_color)
-        cv.imwrite("depth.jpg",depth_map)
-
+        
         rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(color_image, depth16bits_image, 1000.0, 3.0, False)
         pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd_image, cameraIntrinsics)
 
@@ -118,9 +116,17 @@ if __name__ == "__main__":
         # Show the point cloud
         point_cloud.points = pcd.points
         point_cloud.colors = pcd.colors
-        print(point_cloud)
+        # print(point_cloud)
         print(np.asarray(point_cloud.points))
-        o3d.io.write_point_cloud("jc_1.pcd",point_cloud)
+        
+        nm = input("Provide a name for the POV: ")
+        o3d.io.write_point_cloud(f"output_{nm}.pcd",point_cloud)
+        # Export the images 
+        cv.imwrite(f"color_{nm}.jpg",img_color)
+        cv.imwrite(f"depth_{nm}.jpg",depth_map)
+        cv.imwrite(f"ir_{nm}.jpg",ir_map_gray)
+
         if cv.waitKey(1) >= 0 or True:
             break
+        
         
