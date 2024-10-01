@@ -105,6 +105,10 @@ if __name__ == "__main__":
         color_image = o3d.geometry.Image(img_color)
         depth16bits_image = o3d.geometry.Image(depth16bits_map)
 
+        # Export the images 
+        cv.imwrite("color.jpg",color_image)
+        cv.imwrite("depth.jpg",depth_map)
+
         rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(color_image, depth16bits_image, 1000.0, 3.0, False)
         pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd_image, cameraIntrinsics)
 
