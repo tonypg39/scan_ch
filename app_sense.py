@@ -23,7 +23,7 @@ def capture():
     return json.dumps(d)
 
 @app.route('/check_status', methods=['GET'])
-def init():
+def check_status():
     global camera
     d = {
         "running": camera is not None
