@@ -25,7 +25,8 @@ def capture():
 @app.route('/initialize', methods=['GET'])
 def init():
     global camera
-    camera = CameraToF()
+    if camera is None:
+        camera = CameraToF()
     return json.dumps({"success": True})
 
 if __name__ == "__main__":
