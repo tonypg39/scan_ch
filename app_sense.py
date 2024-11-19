@@ -13,19 +13,21 @@ CORS(app)
 @app.route('/capture', methods=['GET'])
 def capture():
     global camera
+    d = {}
     if camera is None:
-        return {} # TODO: Make the Json empty response
-    d = camera.capture()
+        return json.dumps(d)
+    resp = camera.capture()
+    if resp["success"]:
+        d["maps"] = camera.get_maps()
+        d["params"] = camera.get_params()
     return json.dumps(d)
 
 @app.route('/initialize', methods=['GET'])
 def init():
     global camera
     camera = CameraToF()
-    camera_details = camera.camDetails
-    ##FIXME: Check if the object is Json parseable, otherwise, 
-    ## you select the relevant fields and put in a dictionary.
-    ## Intrinsics
-    return json.dumps(camera_details)
+    return json.dumps({"success": True})
 
+if __name__ == "__main__":
+    app.run("0.0.0.0")
     

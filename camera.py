@@ -2,6 +2,7 @@ import aditofpython as tof
 import numpy as np
 import cv2 as cv
 import open3d as o3d
+import time
 from enum import Enum
 
 class ModesEnum(Enum):
@@ -12,12 +13,13 @@ class ModesEnum(Enum):
 class CameraToF():
 
     def __init__(self) -> None:
-        self.system = tof.System()
+        
         self._initialize_cameras()
     
     def _initialize_cameras(self):
+        system = tof.System()
         self.cameras = []
-        status = self.system.getCameraList(self.cameras)
+        status = system.getCameraList(self.cameras)
         if not status:
             print("system.getCameraList() failed with status: ", status)
 
@@ -48,7 +50,8 @@ class CameraToF():
         status = self.cameras[0].getDetails(camDetails)
         if not status:
             print("system.getDetails() failed with status: ", status)
-
+            
+        print("\n\nThe Parameters here are::= ", camDetails.intrinsics.cameraMatrix)
         # Enable noise reduction for better results
         smallSignalThreshold = 100
         self.cameras[0].setControl("noise_reduction_threshold", str(smallSignalThreshold))
@@ -57,21 +60,32 @@ class CameraToF():
     def capture(self):
         camDetails = tof.CameraDetails()
         # Get the first frame for details
+        status = self.cameras[0].getDetails(camDetails)
+        if not status:
+            print("system.getDetails() failed with status: ", status)
+            return {"error": status}
+
         frame = tof.Frame()
-        status = self.cameras[0].requestFrame(self.frame)
+        # status = self.cameras[0].requestFrame(frame)
         frameDetails = tof.FrameDetails()
-        status = self.frame.getDetails(frameDetails)
+        status = frame.getDetails(frameDetails)
         
-        params = self.get_params(camDetails,frameDetails)
-        maps = self.get_maps(frame)
+        self.params = self.update_params(camDetails,frameDetails)
+        self.maps = self.update_maps(frame)
         return {
-            "params": params,
-            "maps": maps
+            "success": True
         }
     
-    def get_params(self,camDetails, frameDetails):
+    def get_params(self):
+        return self.params
+    
+    def get_maps(self):
+        return self.maps
+    
+    def update_params(self,camDetails, frameDetails):
         # Get intrinsic parameters from camera
         intrinsicParameters = camDetails.intrinsics
+        # print("The Parameters here are::= ", camDetails.intrinsics.cameraMatrix)     
         fx = intrinsicParameters.cameraMatrix[0]
         fy = intrinsicParameters.cameraMatrix[4]
         cx = intrinsicParameters.cameraMatrix[2]
@@ -97,10 +111,27 @@ class CameraToF():
                 "cy": cy}
 
     
-    def get_maps(self, frame):
+    def update_maps(self, frame):
+        status = self.cameras[0].requestFrame(frame)
+        if not status:
+            print("cameras[0].requestFrame() failed with status: ", status)
+
+        depth_map = np.array(frame.getData(tof.FrameDataType.Depth), dtype="uint16", copy=False)
+        ir_map = np.array(frame.getData(tof.FrameDataType.IR), dtype="uint16", copy=False)
         depth_map = np.array(frame.getData(tof.FrameDataType.Depth), dtype="uint16", copy=False)
         ir_map = np.array(frame.getData(tof.FrameDataType.IR), dtype="uint16", copy=False)
         return {
-            "depth": depth_map,
-            "ir_map": ir_map
+            "depth": depth_map.tolist(),
+            "ir_map": ir_map.tolist()
         }
+    
+    
+if __name__ == "__main__":
+    cam = CameraToF()
+    while True:
+        print("Attempt to send...")
+        x = cam.capture()
+        y = cam.get_maps()
+        print(type(y["depth"]),len(y["depth"]))
+        time.sleep(5)
+        
