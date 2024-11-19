@@ -118,8 +118,7 @@ class CameraToF():
 
         depth_map = np.array(frame.getData(tof.FrameDataType.Depth), dtype="uint16", copy=False)
         ir_map = np.array(frame.getData(tof.FrameDataType.IR), dtype="uint16", copy=False)
-        depth_map = np.array(frame.getData(tof.FrameDataType.Depth), dtype="uint16", copy=False)
-        ir_map = np.array(frame.getData(tof.FrameDataType.IR), dtype="uint16", copy=False)
+
         return {
             "depth": depth_map.tolist(),
             "ir_map": ir_map.tolist()
